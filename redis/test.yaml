@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ycsb
+  labels:
+    app: test
+spec:
+  containers:
+    - name: web
+      image: 0track/ycsb:latest
+      imagePullPolicy: Always
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
