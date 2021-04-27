@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: redis-master
+  name: redis-worker
 spec:
   serviceName: redis
   replicas: 1
@@ -14,22 +14,9 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis-master
+      - name: redis-worker
         image: redis:6.0-alpine
         ports:
         - containerPort: 6379
-          name: redis-master
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-service
-spec:
-  clusterIP: None
-        #type: NodePort
-  ports:
-    - port: 6379
-      targetPort: 6379
-      #nodePort: 30000 
-  selector:
-      app: redis
+          name: redis-worker
+

@@ -6,10 +6,18 @@ metadata:
     app: test
 spec:
   containers:
-    - name: web
+    - name: ycsb
       image: 0track/ycsb:latest
       imagePullPolicy: Always
       ports:
-        - name: web
+        - name: ycsb
           containerPort: 80
           protocol: TCP
+      securityContext:
+        capabilities:
+          add:
+          - SYS_PTRACE
+      env:
+        - name: ycsb
+          value: "ycsb"
+
