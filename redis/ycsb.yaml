@@ -13,11 +13,3 @@ spec:
         - name: ycsb
           containerPort: 80
           protocol: TCP
-      securityContext:
-        capabilities:
-          add:
-          - SYS_PTRACE
-      env:
-        - name: ycsb
-          value: "ycsb"
-
