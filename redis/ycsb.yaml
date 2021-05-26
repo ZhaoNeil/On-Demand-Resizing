@@ -2,11 +2,9 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ycsb
-  labels:
-    app: test
 spec:
   containers:
-    - name: ycsb
+    - name: ycsb-without-vpa
       image: 0track/ycsb:latest
       imagePullPolicy: Always
       ports:

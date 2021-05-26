@@ -3,8 +3,8 @@ kind: StatefulSet
 metadata:
   name: redis-master
 spec:
-  serviceName: redis
-  replicas: 1
+  serviceName: redis-master
+  replicas: 2
   selector:
     matchLabels:
       app: redis
@@ -19,17 +19,19 @@ spec:
         ports:
         - containerPort: 6379
           name: redis-master
+        resources:
+          requests:
+            cpu: 250m
+            memory: 500Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-service
+  name: redis-master
 spec:
   clusterIP: None
-        #type: NodePort
   ports:
     - port: 6379
-      targetPort: 6379
-      #nodePort: 30000 
+      targetPort: 6379 
   selector:
       app: redis

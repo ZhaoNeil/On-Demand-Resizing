@@ -3,8 +3,8 @@ kind: StatefulSet
 metadata:
   name: redis-worker
 spec:
-  serviceName: redis
-  replicas: 1
+  serviceName: redis-worker
+  replicas: 2
   selector:
     matchLabels:
       app: redis
@@ -19,4 +19,8 @@ spec:
         ports:
         - containerPort: 6379
           name: redis-worker
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
 
