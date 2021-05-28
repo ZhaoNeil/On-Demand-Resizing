@@ -4,7 +4,7 @@ metadata:
   name: ycsb
 spec:
   containers:
-    - name: ycsb-without-vpa
+    - name: ycsb
       image: 0track/ycsb:latest
       imagePullPolicy: Always
       ports:
