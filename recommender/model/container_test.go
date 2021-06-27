@@ -59,7 +59,7 @@ func newContainerTest() ContainerTest {
 	mockCPUHistogram := new(util.MockHistogram)
 	mockMemoryHistogram := new(util.MockHistogram)
 	aggregateContainerState := &AggregateContainerState{
-		AggregateCPUUsage:    mockCPUHistogram,
+		// AggregateCPUUsage:    mockCPUHistogram,
 		AggregateMemoryPeaks: mockMemoryHistogram,
 	}
 	container := &ContainerState{

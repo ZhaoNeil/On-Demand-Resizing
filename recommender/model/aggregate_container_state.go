@@ -37,7 +37,6 @@ package model
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -90,7 +89,7 @@ type ContainerStateAggregator interface {
 // Implements ContainerStateAggregator interface.
 type AggregateContainerState struct {
 	// AggregateCPUUsage is a distribution of all CPU samples.
-	AggregateCPUUsage util.Histogram
+	AggregateCPUUsage util.Observation
 	// AggregateMemoryPeaks is a distribution of memory peaks from all containers:
 	// each container should add one peak per memory aggregation interval (e.g. once every 24h).
 	AggregateMemoryPeaks util.Histogram
@@ -172,7 +171,8 @@ func (a *AggregateContainerState) MergeContainerState(other *AggregateContainerS
 func NewAggregateContainerState() *AggregateContainerState {
 	config := GetAggregationsConfig()
 	return &AggregateContainerState{
-		AggregateCPUUsage:    util.NewDecayingHistogram(config.CPUHistogramOptions, config.CPUHistogramDecayHalfLife),
+		// AggregateCPUUsage:    util.NewDecayingHistogram(config.CPUHistogramOptions, config.CPUHistogramDecayHalfLife),
+		AggregateCPUUsage:    util.NewObservation(),
 		AggregateMemoryPeaks: util.NewDecayingHistogram(config.MemoryHistogramOptions, config.MemoryHistogramDecayHalfLife),
 		CreationTime:         time.Now(),
 	}
@@ -206,12 +206,14 @@ func (a *AggregateContainerState) SubtractSample(sample *ContainerUsageSample) {
 
 func (a *AggregateContainerState) addCPUSample(sample *ContainerUsageSample) {
 	cpuUsageCores := CoresFromCPUAmount(sample.Usage)
-	cpuRequestCores := CoresFromCPUAmount(sample.Request)
+	// cpuRequestCores := CoresFromCPUAmount(sample.Request)
 	// Samples are added with the weight equal to the current request. This means that
 	// whenever the request is increased, the history accumulated so far effectively decays,
 	// which helps react quickly to CPU starvation.
-	a.AggregateCPUUsage.AddSample(
-		cpuUsageCores, math.Max(cpuRequestCores, minSampleWeight), sample.MeasureStart)
+	// a.AggregateCPUUsage.AddSample(
+	// cpuUsageCores, math.Max(cpuRequestCores, minSampleWeight), sample.MeasureStart)
+	a.AggregateCPUUsage.Add(
+		cpuUsageCores, sample.MeasureStart)
 	if sample.MeasureStart.After(a.LastSampleStart) {
 		a.LastSampleStart = sample.MeasureStart
 	}
@@ -228,17 +230,17 @@ func (a *AggregateContainerState) SaveToCheckpoint() (*vpa_types.VerticalPodAuto
 	if err != nil {
 		return nil, err
 	}
-	cpu, err := a.AggregateCPUUsage.SaveToChekpoint()
-	if err != nil {
-		return nil, err
-	}
+	// cpu, err := a.AggregateCPUUsage.SaveToChekpoint()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	return &vpa_types.VerticalPodAutoscalerCheckpointStatus{
 		FirstSampleStart:  metav1.NewTime(a.FirstSampleStart),
 		LastSampleStart:   metav1.NewTime(a.LastSampleStart),
 		TotalSamplesCount: a.TotalSamplesCount,
 		MemoryHistogram:   *memory,
-		CPUHistogram:      *cpu,
-		Version:           SupportedCheckpointVersion,
+		// CPUHistogram:      *cpu,
+		Version: SupportedCheckpointVersion,
 	}, nil
 }
 
@@ -255,10 +257,10 @@ func (a *AggregateContainerState) LoadFromCheckpoint(checkpoint *vpa_types.Verti
 	if err != nil {
 		return err
 	}
-	err = a.AggregateCPUUsage.LoadFromCheckpoint(&checkpoint.CPUHistogram)
-	if err != nil {
-		return err
-	}
+	// err = a.AggregateCPUUsage.LoadFromCheckpoint(&checkpoint.CPUHistogram)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 

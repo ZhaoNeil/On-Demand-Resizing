@@ -6,6 +6,7 @@ import (
 )
 
 type Observation interface {
+	Predict(measures, input int) float64
 	Add(value float64, time time.Time)
 	Subtract(value float64, time time.Time)
 	Merge(other Observation)
@@ -159,4 +160,40 @@ func isEqual(a, b []Item) bool {
 		}
 	}
 	return true
+}
+
+//N is the number of measures to average over
+func (o *observation) Predict(N, input int) float64 {
+	if o.IsEmpty() {
+		return 0.0
+	}
+	var avg []float64
+	length := len(o.bucket)
+	if length >= input-1+N {
+		for i := 0; i < input; i++ {
+			avg = append(avg, average(o.bucket[length-i-N:length-i]))
+		}
+		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1) //m = (l(i)-l(i-q))/q
+		return m*float64(len(avg)) + avg[len(avg)-1]          //m*[(i+1)-(i-q)]
+	} else if length < N {
+		return average(o.bucket)
+	} else { //N <= length < input-1+N
+		for i := 0; i < length-N+1; i++ {
+			avg = append(avg, average(o.bucket[length-i-N:length-i]))
+		}
+		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1)
+		return m*float64(len(avg)) + avg[len(avg)-1] //m*[(i+1)-(i-q)]
+	}
+}
+
+func average(items []Item) float64 {
+	sum := 0.0
+	if len(items) == 0 {
+		return 0.0
+	} else {
+		for _, item := range items {
+			sum += item.value
+		}
+		return float64(sum) / float64(len(items))
+	}
 }
