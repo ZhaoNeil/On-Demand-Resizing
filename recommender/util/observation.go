@@ -6,7 +6,7 @@ import (
 )
 
 type Observation interface {
-	Predict(measures, input int) float64
+	Predict_SMA(N, input int) float64
 	Add(value float64, time time.Time)
 	Subtract(value float64, time time.Time)
 	Merge(other Observation)
@@ -163,7 +163,7 @@ func isEqual(a, b []Item) bool {
 }
 
 //N is the number of measures to average over
-func (o *observation) Predict(N, input int) float64 {
+func (o *observation) Predict_SMA(N, input int) float64 {
 	if o.IsEmpty() {
 		return 0.0
 	}
@@ -174,7 +174,7 @@ func (o *observation) Predict(N, input int) float64 {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
 		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1) //m = (l(i)-l(i-q))/q
-		return m*float64(len(avg)) + avg[len(avg)-1]          //m*[(i+1)-(i-q)]
+		return m*float64(3*len(avg)) + avg[len(avg)-1]        //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	} else if length < N {
 		return average(o.bucket)
 	} else { //N <= length < input-1+N
@@ -182,7 +182,7 @@ func (o *observation) Predict(N, input int) float64 {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
 		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1)
-		return m*float64(len(avg)) + avg[len(avg)-1] //m*[(i+1)-(i-q)]
+		return m*float64(3*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	}
 }
 
@@ -196,4 +196,30 @@ func average(items []Item) float64 {
 		}
 		return float64(sum) / float64(len(items))
 	}
+}
+
+//N is the number of measures to average over
+func (o *observation) Predict_EMA(N, input int) float64 {
+	if o.IsEmpty() {
+		return 0.0
+	}
+	var avg []float64
+	length := len(o.bucket)
+	if length >= N+input-1 {
+		first := average(o.bucket[length-N-input+1 : length-input+1])
+		avg = append(avg, first)
+		for i := length - input + 1; i < length; i++ {
+			tmp := exponentialAvg(o.bucket[i].value, avg[len(avg)-1], N)
+			avg = append(avg, tmp)
+		}
+		m := (avg[len(avg)-1] - avg[0]) / float64(len(avg)-1)
+		return m*float64(3*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = 2q
+	} else {
+		return average(o.bucket)
+	}
+}
+
+func exponentialAvg(value float64, oldValue float64, N int) float64 {
+	alpha := float64(2) / float64(N+1)
+	return alpha*value + (1-alpha)*oldValue
 }
