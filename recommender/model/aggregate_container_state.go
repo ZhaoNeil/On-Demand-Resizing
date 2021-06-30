@@ -229,10 +229,10 @@ func (a *AggregateContainerState) addCPUSample(sample *ContainerUsageSample) {
 // SaveToCheckpoint serializes AggregateContainerState as VerticalPodAutoscalerCheckpointStatus.
 // The serialization may result in loss of precission of the histograms.
 func (a *AggregateContainerState) SaveToCheckpoint() (*vpa_types.VerticalPodAutoscalerCheckpointStatus, error) {
-	// memory, err := a.AggregateMemoryPeaks.SaveToChekpoint()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	memory, err := a.AggregateMemoryPeaks.SaveToChekpoint()
+	if err != nil {
+		return nil, err
+	}
 	// cpu, err := a.AggregateCPUUsage.SaveToChekpoint()
 	// if err != nil {
 	// 	return nil, err
@@ -241,7 +241,7 @@ func (a *AggregateContainerState) SaveToCheckpoint() (*vpa_types.VerticalPodAuto
 		FirstSampleStart:  metav1.NewTime(a.FirstSampleStart),
 		LastSampleStart:   metav1.NewTime(a.LastSampleStart),
 		TotalSamplesCount: a.TotalSamplesCount,
-		// MemoryHistogram:   *memory,
+		MemoryHistogram:   *memory,
 		// CPUHistogram:      *cpu,
 		Version: SupportedCheckpointVersion,
 	}, nil
@@ -256,10 +256,10 @@ func (a *AggregateContainerState) LoadFromCheckpoint(checkpoint *vpa_types.Verti
 	a.TotalSamplesCount = checkpoint.TotalSamplesCount
 	a.FirstSampleStart = checkpoint.FirstSampleStart.Time
 	a.LastSampleStart = checkpoint.LastSampleStart.Time
-	// err := a.AggregateMemoryPeaks.LoadFromCheckpoint(&checkpoint.MemoryHistogram)
-	// if err != nil {
-	// 	return err
-	// }
+	err := a.AggregateMemoryPeaks.LoadFromCheckpoint(&checkpoint.MemoryHistogram)
+	if err != nil {
+		return err
+	}
 	// err = a.AggregateCPUUsage.LoadFromCheckpoint(&checkpoint.CPUHistogram)
 	// if err != nil {
 	// 	return err
