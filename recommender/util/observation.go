@@ -7,6 +7,7 @@ import (
 
 type Observation interface {
 	Predict_SMA(N, input int) float64
+	Predict_EMA(N, input int) float64
 	Add(value float64, time time.Time)
 	Subtract(value float64, time time.Time)
 	Merge(other Observation)
@@ -163,6 +164,7 @@ func isEqual(a, b []Item) bool {
 }
 
 //N is the number of measures to average over
+//Simple Moving Average
 func (o *observation) Predict_SMA(N, input int) float64 {
 	if o.IsEmpty() {
 		return 0.0
@@ -199,6 +201,7 @@ func average(items []Item) float64 {
 }
 
 //N is the number of measures to average over
+//Exponential Moving Average
 func (o *observation) Predict_EMA(N, input int) float64 {
 	if o.IsEmpty() {
 		return 0.0

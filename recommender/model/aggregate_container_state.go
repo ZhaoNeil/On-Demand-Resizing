@@ -174,7 +174,8 @@ func NewAggregateContainerState() *AggregateContainerState {
 		// AggregateCPUUsage:    util.NewDecayingHistogram(config.CPUHistogramOptions, config.CPUHistogramDecayHalfLife),
 		AggregateCPUUsage:    util.NewObservation(),
 		AggregateMemoryPeaks: util.NewDecayingHistogram(config.MemoryHistogramOptions, config.MemoryHistogramDecayHalfLife),
-		CreationTime:         time.Now(),
+		// AggregateMemoryPeaks: util.NewObservation(),
+		CreationTime: time.Now(),
 	}
 }
 
@@ -185,6 +186,7 @@ func (a *AggregateContainerState) AddSample(sample *ContainerUsageSample) {
 		a.addCPUSample(sample)
 	case ResourceMemory:
 		a.AggregateMemoryPeaks.AddSample(BytesFromMemoryAmount(sample.Usage), 1.0, sample.MeasureStart)
+		// a.AggregateMemoryPeaks.Add(BytesFromMemoryAmount(sample.Usage), sample.MeasureStart)
 	default:
 		panic(fmt.Sprintf("AddSample doesn't support resource '%s'", sample.Resource))
 	}
@@ -199,6 +201,7 @@ func (a *AggregateContainerState) SubtractSample(sample *ContainerUsageSample) {
 	switch sample.Resource {
 	case ResourceMemory:
 		a.AggregateMemoryPeaks.SubtractSample(BytesFromMemoryAmount(sample.Usage), 1.0, sample.MeasureStart)
+		// a.AggregateMemoryPeaks.Subtract(BytesFromMemoryAmount(sample.Usage), sample.MeasureStart)
 	default:
 		panic(fmt.Sprintf("SubtractSample doesn't support resource '%s'", sample.Resource))
 	}
@@ -226,10 +229,10 @@ func (a *AggregateContainerState) addCPUSample(sample *ContainerUsageSample) {
 // SaveToCheckpoint serializes AggregateContainerState as VerticalPodAutoscalerCheckpointStatus.
 // The serialization may result in loss of precission of the histograms.
 func (a *AggregateContainerState) SaveToCheckpoint() (*vpa_types.VerticalPodAutoscalerCheckpointStatus, error) {
-	memory, err := a.AggregateMemoryPeaks.SaveToChekpoint()
-	if err != nil {
-		return nil, err
-	}
+	// memory, err := a.AggregateMemoryPeaks.SaveToChekpoint()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	// cpu, err := a.AggregateCPUUsage.SaveToChekpoint()
 	// if err != nil {
 	// 	return nil, err
@@ -238,7 +241,7 @@ func (a *AggregateContainerState) SaveToCheckpoint() (*vpa_types.VerticalPodAuto
 		FirstSampleStart:  metav1.NewTime(a.FirstSampleStart),
 		LastSampleStart:   metav1.NewTime(a.LastSampleStart),
 		TotalSamplesCount: a.TotalSamplesCount,
-		MemoryHistogram:   *memory,
+		// MemoryHistogram:   *memory,
 		// CPUHistogram:      *cpu,
 		Version: SupportedCheckpointVersion,
 	}, nil
@@ -253,10 +256,10 @@ func (a *AggregateContainerState) LoadFromCheckpoint(checkpoint *vpa_types.Verti
 	a.TotalSamplesCount = checkpoint.TotalSamplesCount
 	a.FirstSampleStart = checkpoint.FirstSampleStart.Time
 	a.LastSampleStart = checkpoint.LastSampleStart.Time
-	err := a.AggregateMemoryPeaks.LoadFromCheckpoint(&checkpoint.MemoryHistogram)
-	if err != nil {
-		return err
-	}
+	// err := a.AggregateMemoryPeaks.LoadFromCheckpoint(&checkpoint.MemoryHistogram)
+	// if err != nil {
+	// 	return err
+	// }
 	// err = a.AggregateCPUUsage.LoadFromCheckpoint(&checkpoint.CPUHistogram)
 	// if err != nil {
 	// 	return err
