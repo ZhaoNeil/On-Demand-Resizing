@@ -1,6 +1,7 @@
 package util
 
 import (
+	"math"
 	"sort"
 	"time"
 )
@@ -176,7 +177,11 @@ func (o *observation) Predict_SMA(N, input int) float64 {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
 		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1) //m = (l(i)-l(i-q))/q
-		return m*float64(3*len(avg)) + avg[len(avg)-1]        //m*[(i+k)-(i-q)]+l(i-q), k = 2q
+		if m <= 0 {
+			return avg[0]
+		} else {
+			return m*float64(2*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = q
+		}
 	} else if length < N {
 		return average(o.bucket)
 	} else { //N <= length < input-1+N
@@ -184,7 +189,11 @@ func (o *observation) Predict_SMA(N, input int) float64 {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
 		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1)
-		return m*float64(3*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = 2q
+		if m <= 0 {
+			return avg[0]
+		} else {
+			return m*float64(2*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = q
+		}
 	}
 }
 
@@ -216,7 +225,7 @@ func (o *observation) Predict_EMA(N, input int) float64 {
 			avg = append(avg, tmp)
 		}
 		m := (avg[len(avg)-1] - avg[0]) / float64(len(avg)-1)
-		return m*float64(3*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = 2q
+		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[0])
 	} else {
 		return average(o.bucket)
 	}
