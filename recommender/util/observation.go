@@ -176,12 +176,8 @@ func (o *observation) Predict_SMA(N, input int) float64 {
 		for i := 0; i < input; i++ {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
-		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1) //m = (l(i)-l(i-q))/q
-		if m <= 0 {
-			return avg[0]
-		} else {
-			return m*float64(2*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = q
-		}
+		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1)                                          //m = (l(i)-l(i-q))/q
+		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[len(avg)-1]) //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	} else if length < N {
 		return average(o.bucket)
 	} else { //N <= length < input-1+N
@@ -189,11 +185,7 @@ func (o *observation) Predict_SMA(N, input int) float64 {
 			avg = append(avg, average(o.bucket[length-i-N:length-i]))
 		}
 		m := (avg[0] - avg[len(avg)-1]) / float64(len(avg)-1)
-		if m <= 0 {
-			return avg[0]
-		} else {
-			return m*float64(2*len(avg)) + avg[len(avg)-1] //m*[(i+k)-(i-q)]+l(i-q), k = q
-		}
+		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[len(avg)-1]) //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	}
 }
 
@@ -225,7 +217,7 @@ func (o *observation) Predict_EMA(N, input int) float64 {
 			avg = append(avg, tmp)
 		}
 		m := (avg[len(avg)-1] - avg[0]) / float64(len(avg)-1)
-		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[0])
+		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[0]) //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	} else {
 		return average(o.bucket)
 	}
