@@ -217,7 +217,7 @@ func (o *observation) Predict_EMA(N, input int) float64 {
 			avg = append(avg, tmp)
 		}
 		m := (avg[len(avg)-1] - avg[0]) / float64(len(avg)-1)
-		return math.Max(1.5*average(o.bucket[length-N:length]), m*float64(3*len(avg))+avg[0]) //m*[(i+k)-(i-q)]+l(i-q), k = 2q
+		return math.Max(1.5*avg[len(avg)-1], m*float64(3*len(avg))+avg[0]) //m*[(i+k)-(i-q)]+l(i-q), k = 2q
 	} else {
 		return average(o.bucket)
 	}
