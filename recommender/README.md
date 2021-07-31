@@ -1,8 +1,7 @@
 # VPA Recommender
+Source code is from this [code](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler/pkg/recommender).
 
-- [Intro](#intro)
-- [Running](#running)
-- [Implementation](#implmentation)
+
 ## Intro
 
 Recommender is the core binary of Vertical Pod Autoscaler system.
