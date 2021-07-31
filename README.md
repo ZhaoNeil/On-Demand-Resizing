@@ -1,6 +1,6 @@
 # On-Demand-Resizing
 
-Design a mechanism and policies for on-demand (resource) resizing of existing containers.
+Design a mechanism for on-demand (resource) resizing of existing containers.
 
 **data** file contains analysis code for the performance of pods.
 
