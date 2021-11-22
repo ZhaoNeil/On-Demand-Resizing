@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-processing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: video-processing
+  template:
+    metadata:
+      labels:
+        app: video-processing
+    spec:
+      containers:
+      - name: video-processing
+        image: zhaoneil/video_processing_67m:var_workload
+        #command: ["/usr/local/bin/python3", "/server.py"]

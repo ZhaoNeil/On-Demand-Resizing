@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: base
+  labels:
+    app: base
+spec:
+  containers:
+    - name: base
+      image: zhaoneil/py_grpc:base
+      imagePullPolicy: Always
+      ports:
+        - name: base
+          containerPort: 80
+          protocol: TCP

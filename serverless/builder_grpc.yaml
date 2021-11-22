@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: builder_grpc
+  labels:
+    app: builder_grpc
+spec:
+  containers:
+    - name: builder_grpc
+      image: zhaoneil/py_grpc:builder_grpc
+      imagePullPolicy: Always
+      ports:
+        - name: builder_grpc
+          containerPort: 80
+          protocol: TCP

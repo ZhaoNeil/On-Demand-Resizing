@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-rotate
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: image-rotate
+  template:
+    metadata:
+      labels:
+        app: image-rotate
+    spec:
+      containers:
+      - name: image-rotate
+        image: zhaoneil/image_rotate:var_workload
