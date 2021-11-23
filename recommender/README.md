@@ -1,4 +1,4 @@
-# VPA Recommender
+# VPA Recommender for Redis
 Source code is from this [code](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler/pkg/recommender). Change the image name to new image name instead of the default one in *autoscaler/vertical-pod-autoscaler/deploy/recommender-deployment.yaml*
 
 
