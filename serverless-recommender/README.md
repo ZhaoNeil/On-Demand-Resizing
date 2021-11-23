@@ -1,8 +1,7 @@
-# VPA Recommender
+# VPA Recommender for Serverless Workloads
+Source code is from this [code](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler/pkg/recommender). Change the image name to new image name instead of the default one in *autoscaler/vertical-pod-autoscaler/deploy/recommender-deployment.yaml*
 
-- [Intro](#intro)
-- [Running](#running)
-- [Implementation](#implmentation)
+
 ## Intro
 
 Recommender is the core binary of Vertical Pod Autoscaler system.
