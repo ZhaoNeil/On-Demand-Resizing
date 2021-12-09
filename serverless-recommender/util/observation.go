@@ -80,8 +80,10 @@ func (o *observation) Subtract(value float64, time time.Time) {
 			i--
 		}
 	}
-	o.beginTime = o.bucket[0].time
-	o.endTime = o.bucket[len(o.bucket)-1].time
+	if len(o.bucket) != 0 {
+		o.beginTime = o.bucket[0].time
+		o.endTime = o.bucket[len(o.bucket)-1].time
+	}
 }
 
 func (o *observation) Merge(other Observation) {
@@ -91,8 +93,10 @@ func (o *observation) Merge(other Observation) {
 	sort.Sort(o.bucket)
 	sort.Sort(another.bucket)
 	o.bucket = mergeArr(o.bucket, another.bucket)
-	o.beginTime = o.bucket[0].time
-	o.endTime = o.bucket[len(o.bucket)-1].time
+	if len(o.bucket) != 0 {
+		o.beginTime = o.bucket[0].time
+		o.endTime = o.bucket[len(o.bucket)-1].time
+	}
 }
 
 func (o *observation) IsEmpty() bool {
