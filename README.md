@@ -1,6 +1,6 @@
 # On-Demand-Resizing
 
-This repository contains deploy code and analysis code for paper [Tiny Autoscalers for Tiny Workloads: Dynamic CPU Allocation for Serverless Functions](https://alexandru-uta.github.io/pubs/tinyautoscalers.pdf), which is accepted by CCGrid 2022.
+This repository contains deploy code and analysis code for paper [Tiny Autoscalers for Tiny Workloads: Dynamic CPU Allocation for Serverless Functions](https://alexandru-uta.github.io/pubs/tinyautoscalers.pdf), which was accepted at CCGrid 2022.
 
 Authors:
 * Yuxuan Zhao(y.zhao@liacs.leidenuniv.nl)
